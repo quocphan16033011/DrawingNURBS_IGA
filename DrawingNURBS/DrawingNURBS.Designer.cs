@@ -30,11 +30,21 @@ namespace DrawingNURBS
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("PlaneXY");
+            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("PlaneYZ");
+            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("PlaneZX");
+            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Patch");
+            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("Geometry", new System.Windows.Forms.TreeNode[] {
+            treeNode1,
+            treeNode2,
+            treeNode3,
+            treeNode4});
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DrawingNURBS));
             this.MainBody = new System.Windows.Forms.SplitContainer();
             this.ToolBox = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.RectangleBtn = new System.Windows.Forms.Button();
+            this.ClearBtn = new System.Windows.Forms.Button();
+            this.PolyLine = new System.Windows.Forms.Button();
             this.LineBtn = new System.Windows.Forms.Button();
             this.PointBtn = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
@@ -110,26 +120,39 @@ namespace DrawingNURBS
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.RectangleBtn);
+            this.tabPage1.Controls.Add(this.ClearBtn);
+            this.tabPage1.Controls.Add(this.PolyLine);
             this.tabPage1.Controls.Add(this.LineBtn);
             this.tabPage1.Controls.Add(this.PointBtn);
-            this.tabPage1.Location = new System.Drawing.Point(4, 25);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(870, 106);
+            this.tabPage1.Size = new System.Drawing.Size(870, 109);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "tabPage1";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // RectangleBtn
+            // ClearBtn
             // 
-            this.RectangleBtn.AccessibleName = "RectangleBtn";
-            this.RectangleBtn.Location = new System.Drawing.Point(167, 6);
-            this.RectangleBtn.Name = "RectangleBtn";
-            this.RectangleBtn.Size = new System.Drawing.Size(77, 94);
-            this.RectangleBtn.TabIndex = 2;
-            this.RectangleBtn.Text = "Rectangle";
-            this.RectangleBtn.UseVisualStyleBackColor = true;
+            this.ClearBtn.AccessibleName = "ClearBtn";
+            this.ClearBtn.Location = new System.Drawing.Point(250, 6);
+            this.ClearBtn.Name = "ClearBtn";
+            this.ClearBtn.Size = new System.Drawing.Size(77, 94);
+            this.ClearBtn.TabIndex = 3;
+            this.ClearBtn.Text = "Clear";
+            this.ClearBtn.UseVisualStyleBackColor = true;
+            this.ClearBtn.Click += new System.EventHandler(this.ClearBtn_Click);
+            // 
+            // PolyLine
+            // 
+            this.PolyLine.AccessibleName = "PolyLine";
+            this.PolyLine.Location = new System.Drawing.Point(167, 6);
+            this.PolyLine.Name = "PolyLine";
+            this.PolyLine.Size = new System.Drawing.Size(77, 94);
+            this.PolyLine.TabIndex = 2;
+            this.PolyLine.Text = "Poly Line";
+            this.PolyLine.UseVisualStyleBackColor = true;
+            this.PolyLine.Click += new System.EventHandler(this.PolyLineBtn_Click);
             // 
             // LineBtn
             // 
@@ -155,10 +178,10 @@ namespace DrawingNURBS
             // 
             // tabPage2
             // 
-            this.tabPage2.Location = new System.Drawing.Point(4, 25);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(870, 106);
+            this.tabPage2.Size = new System.Drawing.Size(870, 109);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "tabPage2";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -229,7 +252,7 @@ namespace DrawingNURBS
             this.DrawingBodyMain.Panel2.BackColor = System.Drawing.SystemColors.Window;
             this.DrawingBodyMain.Panel2.Controls.Add(this.statusStrip1);
             this.DrawingBodyMain.Panel2.Controls.Add(this.panel1);
-            this.DrawingBodyMain.Size = new System.Drawing.Size(881, 439);
+            this.DrawingBodyMain.Size = new System.Drawing.Size(881, 457);
             this.DrawingBodyMain.SplitterDistance = 249;
             this.DrawingBodyMain.SplitterWidth = 1;
             this.DrawingBodyMain.TabIndex = 0;
@@ -252,8 +275,8 @@ namespace DrawingNURBS
             // 
             this.TreeAndDetail.Panel2.AccessibleName = "DetailBox";
             this.TreeAndDetail.Panel2.BackColor = System.Drawing.SystemColors.Window;
-            this.TreeAndDetail.Size = new System.Drawing.Size(249, 439);
-            this.TreeAndDetail.SplitterDistance = 211;
+            this.TreeAndDetail.Size = new System.Drawing.Size(249, 457);
+            this.TreeAndDetail.SplitterDistance = 217;
             this.TreeAndDetail.SplitterWidth = 1;
             this.TreeAndDetail.TabIndex = 0;
             // 
@@ -263,10 +286,22 @@ namespace DrawingNURBS
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.TreeLine.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.TreeLine.Location = new System.Drawing.Point(-2, -5);
+            this.TreeLine.Location = new System.Drawing.Point(-2, 0);
             this.TreeLine.Margin = new System.Windows.Forms.Padding(0);
             this.TreeLine.Name = "TreeLine";
-            this.TreeLine.Size = new System.Drawing.Size(252, 214);
+            treeNode1.Name = "PlaneXY";
+            treeNode1.Text = "PlaneXY";
+            treeNode2.Name = "PlaneYZ";
+            treeNode2.Text = "PlaneYZ";
+            treeNode3.Name = "PlaneZX";
+            treeNode3.Text = "PlaneZX";
+            treeNode4.Name = "Patch";
+            treeNode4.Text = "Patch";
+            treeNode5.Name = "Geometry";
+            treeNode5.Text = "Geometry";
+            this.TreeLine.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
+            treeNode5});
+            this.TreeLine.Size = new System.Drawing.Size(252, 215);
             this.TreeLine.TabIndex = 0;
             // 
             // statusStrip1
@@ -276,7 +311,7 @@ namespace DrawingNURBS
             this.statusStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.Coordinate});
-            this.statusStrip1.Location = new System.Drawing.Point(539, 379);
+            this.statusStrip1.Location = new System.Drawing.Point(538, 379);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(100, 26);
             this.statusStrip1.TabIndex = 1;
@@ -298,7 +333,7 @@ namespace DrawingNURBS
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Margin = new System.Windows.Forms.Padding(0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(647, 379);
+            this.panel1.Size = new System.Drawing.Size(635, 379);
             this.panel1.TabIndex = 2;
             // 
             // DrawingNURBS
@@ -313,7 +348,7 @@ namespace DrawingNURBS
             this.Name = "DrawingNURBS";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "DrawingNURBS";
-            this.Load += new System.EventHandler(this.DrawingNURBS_Load);
+            this.Load += new System.EventHandler(this.drawingNURBS_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.CancelTool);
             this.MainBody.Panel1.ResumeLayout(false);
             this.MainBody.Panel1.PerformLayout();
@@ -355,9 +390,10 @@ namespace DrawingNURBS
         private TabPage tabPage2;
         private TreeView TreeLine;
         private Panel panel1;
-        private Button RectangleBtn;
+        private Button PolyLine;
         private Button LineBtn;
         private Button PointBtn;
+        private Button ClearBtn;
     }
 }
 

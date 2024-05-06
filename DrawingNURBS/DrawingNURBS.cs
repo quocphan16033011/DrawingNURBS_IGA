@@ -13,23 +13,27 @@ using System.Windows.Forms;
 using System.Numerics;
 using System.Reflection;
 using Kitware.VTK;
-//using DEMSoft.Drawing;
 using Microsoft.Win32;
+using Point = DEMSoft.Drawing.Point;
 using DEMSoft.Drawing;
-//using DrawingNURBS;
+using DEMSoft.Drawing.Geometry;
 
 namespace DrawingNURBS
 {
     public partial class DrawingNURBS : Form
     {
-        private ViewerForm DrawingBodyViewer;
+        private Form mainForm;
+        public ViewerForm DrawingBodyViewer;
         private vtkRenderer renderer;
         private vtkRenderWindowInteractor interactor;
         private vtkCamera camera;
         private vtkPicker picker = new vtkPicker();
-        private List<DEMSoft.Drawing.Point> listPoints;
-        private List<DEMSoft.Drawing.Point> listPointsLine;
-        private double[] CoordinateWorld;
+
+        private List<Point> listPoints;
+        private List<Point> listPointsPolyLine;
+        private List<Point> listPointLine;
+        static double[] CoordinateWorld;
+
         public DrawingNURBS()
         {
             InitializeComponent();
@@ -37,8 +41,7 @@ namespace DrawingNURBS
             this.DrawingBodyViewer = new ViewerForm(true);
         }
 
-        private Form mainForm;
-        private void OpenDrawing(ViewerForm form)
+        private void openDrawing(ViewerForm form)
         {
             mainForm = form;
             form.TopLevel = false;
@@ -48,29 +51,23 @@ namespace DrawingNURBS
             panel1.Tag = form;
             form.FormBorderStyle = FormBorderStyle.None;
             form.Dock = DockStyle.Fill;
-            form.SendToBack();
-            DEMSoft.Drawing.Point point = new DEMSoft.Drawing.Point(10, 10, 0);
-            point.SetPointSize(5);
-            point.SetRandomColor();
-            //form.AddObject3D(point);
-            Origin origin = new Origin(new Coordination(TypeCoordination.Cartesian), 10);
-            //form.AddObject3D(origin);
             form.UpdateCamera();
             listPoints = new List<DEMSoft.Drawing.Point>();
-            listPointsLine = new List<DEMSoft.Drawing.Point>();
-            //form.Show();
+            listPointsPolyLine = new List<DEMSoft.Drawing.Point>();
+            listPointLine = new List<Point>();
         }
 
-        private void DrawingNURBS_Load(object sender, EventArgs e)
+        private void drawingNURBS_Load(object sender, EventArgs e)
         {
-            OpenDrawing(DrawingBodyViewer);
+            openDrawing(DrawingBodyViewer);
             interactor = DrawingBodyViewer.renderWindowInteractor;
             renderer = DrawingBodyViewer.viewerRender.RenderWindow.GetRenderers().GetFirstRenderer();
             camera = renderer.GetActiveCamera();
-            interactor.MouseMoveEvt += MouseMoveHandler;
+            interactor.MouseMoveEvt += mouseMoveHandler;
+            DrawingBodyViewer.UpdateCamera();
         }
 
-        private void MouseMoveHandler(object sender, vtkObjectEventArgs e)
+        private void mouseMoveHandler(object sender, vtkObjectEventArgs e)
         {
             vtkRenderWindowInteractor interactor = (vtkRenderWindowInteractor)sender;
 
@@ -94,9 +91,14 @@ namespace DrawingNURBS
             Coordinate.Text = coordinates;
         }
 
-        private void CreatePoint(vtkObject sender, vtkObjectEventArgs e)
+        public static double[] takeCoordinate()
         {
-            DEMSoft.Drawing.Point point = new DEMSoft.Drawing.Point(CoordinateWorld[0], CoordinateWorld[1], CoordinateWorld[2]);
+            return CoordinateWorld;
+        }
+
+        private void createPoint(vtkObject sender, vtkObjectEventArgs e)
+        {
+            Point point = new Point(CoordinateWorld[0], CoordinateWorld[1], CoordinateWorld[2]);
             point.ColorObject = Color.Red;
             point.SetPointSize(5);
             listPoints.Add(point);
@@ -104,53 +106,94 @@ namespace DrawingNURBS
             {
                 DrawingBodyViewer.AddObject3D(listPoints[i]);
                 DrawingBodyViewer.Show();
-                //DrawingBodyViewer.UpdateCamera();
+                DrawingBodyViewer.viewerRender.RenderWindow.Render();
+
             }
         }
 
-        private void CreateLine(vtkObject sender, vtkObjectEventArgs e)
+        private void createLine(vtkObject sender, vtkObjectEventArgs e)
+        {
+
+            Point point = new Point(CoordinateWorld[0], CoordinateWorld[1], CoordinateWorld[2]);
+            listPointLine.Add(point);
+            if (listPointLine.Count == 2)
+            {
+                double[] x = new double[listPointLine.Count];
+                double[] y = new double[listPointLine.Count];
+                double[] z = new double[listPointLine.Count];
+
+                for (int i = 0; i < listPointLine.Count; i++)
+                {
+                    x[i] = listPointLine[i].GetCoordinate()[0];
+                    y[i] = listPointLine[i].GetCoordinate()[1];
+                    z[i] = listPointLine[i].GetCoordinate()[2];
+                    listPointLine[i].ColorObject = Color.Red;
+                    listPointLine[i].SetPointSize(5);
+                }
+                Line line = new Line(x[0], y[0], z[0], x[1], y[1], z[1]);
+                line.ColorObject = Color.Black;
+                line.SetWidth(1);
+                DrawingBodyViewer.AddObject3D(line);
+                DrawingBodyViewer.AddObject3D(listPointLine[0]);
+                DrawingBodyViewer.AddObject3D(listPointLine[1]);
+                DrawingBodyViewer.viewerRender.RenderWindow.Render();
+                listPointLine = new List<Point>();
+            }
+
+        }
+
+        private void createPolyLine(vtkObject sender, vtkObjectEventArgs e)
         {
             DEMSoft.Drawing.Point point = new DEMSoft.Drawing.Point(CoordinateWorld[0], CoordinateWorld[1], CoordinateWorld[2]);
             point.ColorObject = Color.Red;
             point.SetPointSize(5);
-            listPointsLine.Add(point);
+            listPointsPolyLine.Add(point);
             //DrawingBodyViewer.Clear();
-            for (int i = 0; i < listPointsLine.Count; i++)
+            for (int i = 0; i < listPointsPolyLine.Count; i++)
             {
-                DrawingBodyViewer.AddObject3D(listPointsLine[i]);
+                DrawingBodyViewer.AddObject3D(listPointsPolyLine[i]);
                 DrawingBodyViewer.Show();
                 //DrawingBodyViewer.UpdateCamera();
             }
-            if (listPointsLine.Count >= 2)
+            if (listPointsPolyLine.Count >= 2)
             {
-                double[] x = new double[listPointsLine.Count];
-                double[] y = new double[listPointsLine.Count];
-                double[] z = new double[listPointsLine.Count];
+                double[] x = new double[listPointsPolyLine.Count];
+                double[] y = new double[listPointsPolyLine.Count];
+                double[] z = new double[listPointsPolyLine.Count];
 
-                for (int i = 0; i < listPointsLine.Count; i++)
+                for (int i = 0; i < listPointsPolyLine.Count; i++)
                 {
-                    x[i] = listPointsLine[i].GetCoordinate()[0];
-                    y[i] = listPointsLine[i].GetCoordinate()[1];
-                    z[i] = listPointsLine[i].GetCoordinate()[2];
+                    x[i] = listPointsPolyLine[i].GetCoordinate()[0];
+                    y[i] = listPointsPolyLine[i].GetCoordinate()[1];
+                    z[i] = listPointsPolyLine[i].GetCoordinate()[2];
                 }
                 Polyline polyline = new Polyline(x, y, z);
                 polyline.ColorObject = Color.Black;
-                polyline.SetWidth(5);
+                polyline.SetWidth(1);
                 DrawingBodyViewer.AddObject3D(polyline);
+                DrawingBodyViewer.viewerRender.RenderWindow.Render();
             }
-
         }
 
         private void PointBtn_Click(object sender, EventArgs e)
         {
-            interactor.MiddleButtonPressEvt += CreatePoint;
-            interactor.MiddleButtonPressEvt -= CreateLine;
+            interactor.MiddleButtonPressEvt += createPoint;
+            interactor.MiddleButtonPressEvt -= createPolyLine;
+            interactor.MiddleButtonPressEvt -= createLine;
         }
 
-        private void LineBtn_Click(object sender, EventArgs e)
+        private void PolyLineBtn_Click(object sender, EventArgs e)
         {
-            interactor.MiddleButtonPressEvt += CreateLine;
-            interactor.MiddleButtonPressEvt -= CreatePoint;
+            interactor.MiddleButtonPressEvt -= createPoint;
+            interactor.MiddleButtonPressEvt -= createLine;
+            interactor.MiddleButtonPressEvt += createPolyLine;
+        }
+
+        private void LineBtn_Click(object sender, EventArgs args)
+        {
+            interactor.MiddleButtonPressEvt -= createPoint;
+            interactor.MiddleButtonPressEvt -= createPolyLine;
+            interactor.MiddleButtonPressEvt += createLine;
         }
 
         private void CancelTool(object sender, KeyEventArgs e)
@@ -160,6 +203,15 @@ namespace DrawingNURBS
                 LineBtn.Enabled = false;
                 LineBtn.IsAccessible = false;
             }
+        }
+
+        private void ClearBtn_Click(object sender, EventArgs e)
+        {
+            listPointLine.Clear();
+            listPoints.Clear();
+            listPointsPolyLine.Clear();
+            DrawingBodyViewer.Clear();
+            DrawingBodyViewer.viewerRender.RenderWindow.Render();
         }
     }
 }

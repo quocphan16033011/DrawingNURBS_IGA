@@ -118,15 +118,6 @@
     <Compile Include="DrawingNURBS.Designer.cs">
       <DependentUpon>DrawingNURBS.cs</DependentUpon>
     </Compile>
-    <Compile Include="Model\Draw\Arc.cs" />
-    <Compile Include="Model\Draw\Circle.cs" />
-    <Compile Include="Model\Draw\ControlPoint.cs" />
-    <Compile Include="Model\Draw\KnotVector.cs" />
-    <Compile Include="Model\Draw\Line.cs" />
-    <Compile Include="Model\Draw\NURBS_Surface.cs" />
-    <Compile Include="Model\Draw\Rectangle.cs" />
-    <Compile Include="Model\Draw\Spline.cs" />
-    <Compile Include="Model\GL\CreateGL\OpenGLWInform.cs" />
     <Compile Include="Model\Test.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -144,8 +135,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <None Include="Model\Shader\Shader_Black2D.frag" />
-    <None Include="Model\Shader\Shader_Black2D.vert" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -161,7 +150,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Model\GL\EventGL\" />
+    <Folder Include="Model\Draw\" />
     <Folder Include="Model\Modify\" />
     <Folder Include="Model\Setting\" />
   </ItemGroup>
